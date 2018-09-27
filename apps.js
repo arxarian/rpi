@@ -2,29 +2,36 @@ var express = require('express');
 var app = express();
 
 const pg = require('pg');
-const connectionString = 'postgres://measuser:measuser@localhost:5432/measurements';
-const client = new pg.Client(connectionString);
 
-client.connect();
-
-var lastRows = "empty"
-
-async function getLastRows(var count) {
-	client.query('SELECT * FROM basecamp ORDER BY timestamp DESC LIMIT 3', (err, res) => {
-	//  console.log(err ? err.stack : res.rows)
-		lastRows = res.rows;
-	  client.end()
-	})
+var config = {
+  user: 'measuser', // env var: PGUSER
+  database: 'measurements', // env var: PGDATABASE
+  password: 'measuser', // env var: PGPASSWORD
+  host: 'localhost', // Server hosting the postgres database
+  port: 5432, // env var: PGPORT
+  max: 10, // max number of clients in the pool
+  idleTimeoutMillis: 30000 // how long a client is allowed to remain idle before being closed
 }
 
+app.set('port', 80);
+
 app.get('/', function (req, res) {
-	await client.query('SELECT * FROM basecamp ORDER BY timestamp DESC LIMIT 3', (err, res) => {
-		lastRows = res.rows;
-		client.end()
+	var pool = new pg.Pool(config);
+
+	pool.connect(function(err, client, done) {
+		if (err) {
+			console.log("error:", err)
+		}
+
+		client.query('SELECT * FROM basecamp ORDER BY timestamp DESC LIMIT 3', function (err, res) {
+			done()
+			res.send(res.rows);
+		})
 	})
-	res.send(lastRows);
+
+	pool.end()
 });
 
-app.listen(80, function () {
-  console.log('Example app listening on port 3000!');
+app.listen(app.get('port'), function () {
+	console.log('server started on port ' + app.get('port'));
 });
