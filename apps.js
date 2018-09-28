@@ -23,9 +23,9 @@ app.get('/', function (req, res) {
 			console.log("error:", err)
 		}
 
-		client.query('SELECT * FROM basecamp ORDER BY timestamp DESC LIMIT 3', function (err, res) {
+		client.query('SELECT * FROM basecamp ORDER BY timestamp DESC LIMIT 3', function (err, result) {
 			done()
-			res.send(res.rows);
+			res.send(result.rows)
 		})
 	})
 
