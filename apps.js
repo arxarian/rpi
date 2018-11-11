@@ -13,9 +13,17 @@ var config = {
     idleTimeoutMillis: 30000 // how long a client is allowed to remain idle before being closed
 }
 
+app.get('/', function (req, res) {
+   res.sendFile( __dirname + "/" + "index.html" );
+})
+
+app.get('/heatmap/dst/Chart.HeatMap.S.js', function (req, res) {
+   res.sendFile( __dirname + "/" + "heatmap/dst/Chart.HeatMap.S.js" );
+})
+
 app.set('port', 80);
 
-app.get('/', function (req, res) {
+app.get('/data', function (req, res) {
     console.time("request")
     var pool = new pg.Pool(config);
 
