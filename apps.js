@@ -1,5 +1,6 @@
 var express = require('express');
 var app = express();
+var moment = require('moment');
 
 const pg = require('pg');
 
@@ -14,6 +15,7 @@ var config = {
 }
 
 app.use(express.static('public'))
+app.use('/scripts', express.static(__dirname + '/node_modules/moment/min/'))
 
 app.set('port', 80);
 
