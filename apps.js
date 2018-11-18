@@ -13,13 +13,7 @@ var config = {
     idleTimeoutMillis: 30000 // how long a client is allowed to remain idle before being closed
 }
 
-app.get('/', function (req, res) {
-   res.sendFile( __dirname + "/" + "index.html" );
-})
-
-app.get('/heatmap/dst/Chart.HeatMap.S.js', function (req, res) {
-   res.sendFile( __dirname + "/" + "heatmap/dst/Chart.HeatMap.S.js" );
-})
+app.use(express.static('public'))
 
 app.set('port', 80);
 
@@ -33,7 +27,9 @@ app.get('/data', function (req, res) {
         }
         console.time("connect")
 
-        client.query('SELECT * FROM basecamp ORDER BY timestamp DESC LIMIT 3', function (err, result) {
+        client.query("SELECT timestamp,temp FROM basecamp " +
+                     "WHERE timestamp > now() - interval '1 day'" +
+                     "ORDER BY timestamp", function (err, result) {
             done()
             console.time("end")
             res.send(result.rows)

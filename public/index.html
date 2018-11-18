@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>My first Chartist Tests</title>
+    <link rel="stylesheet" href="chartist-js/dist/chartist.min.css">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <script src="chartist-js/dist/chartist.min.js"></script> 
+
+    <div class="ct-chart ct-minor-seventh"></div>
+    <script>
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.open("GET", "./data", false ); // false for synchronous request
+        xmlHttp.send(null);
+        var rawData = xmlHttp.responseText;
+        
+        var jsonData = JSON.parse(rawData);
+        var data = jsonData.map(a => a.temp);
+            
+        new Chartist.Line('.ct-chart', {
+          labels: [],
+          series: [ data ]
+        }, {
+            high: 30,
+            low: 0,
+//            showPoint: false,
+        });
+    </script>
+  </body>
+</html>
