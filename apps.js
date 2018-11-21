@@ -16,6 +16,7 @@ var config = {
 
 app.use(express.static('public'))
 app.use('/scripts', express.static(__dirname + '/node_modules/moment/min/'))
+app.use('/chartist', express.static(__dirname + '/node_modules/chartist-js/'))
 
 app.set('port', 80);
 
