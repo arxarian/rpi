@@ -10,38 +10,65 @@
     <script src="scripts/moment.min.js"></script> 
 
     <div class="ct-chart ct-minor-seventh"></div>
+
+    <form name="rangeSelector">
+        <input id="rDay" type="radio" name="range" value="day" onclick="getData(value)">
+        <label for="rDay">Day</label>
+        <input id="rWeek" type="radio" name="range" value="week" onclick="getData(value)">
+        <label for="rWeek">Week</label>
+    </form>
+
     <script>
-        var xmlHttp = new XMLHttpRequest();
-        xmlHttp.open("GET", "./data", false ); // false for synchronous request
-        xmlHttp.send(null);
-        var rawData = xmlHttp.responseText;
-        
-        var jsonMeasurements = JSON.parse(rawData)
-        
-        var data = []
-        for (var i = 0; i < jsonMeasurements.length; ++i) {
-            var measurement = jsonMeasurements[i]
-            data.push({x: new Date(measurement.timestamp), y: measurement.temp})
-        }
-        
-        new Chartist.Line('.ct-chart', {
-            series: [{
-                name: 'series-1',
-                data: data
-            }]
-        }, {
-            high: 25,
-            low: 0,
-            showPoint: false,
-            axisX: {
-                onlyInteger: true,
-                type: Chartist.FixedScaleAxis,
-                divisor: 15,
-                labelInterpolationFnc: function(value) {
-                    return moment(value).format('HH:MM D/MM');
+        function drawChart(data) {
+            new Chartist.Line('.ct-chart', {
+                series: [{
+                    name: 'series-1',
+                    data: data
+                }]
+            }, {
+                high: 25,
+                low: 0,
+                showPoint: false,
+                axisY: {
+                    onlyInteger: true,
+                    labelInterpolationFnc: function(value, index) {
+                        return index % 2 === 0 ? value + " °C" : null
+                    }
+
+                },
+                axisX: {
+                    onlyInteger: true,
+                    type: Chartist.FixedScaleAxis,
+                    divisor: 14,
+                    labelInterpolationFnc: function(value) {
+                        return moment(value).format('HH:MM D/MM');
+                    }
                 }
-            }
-        });
+            });
+        }
+
+        function getData(range) {
+            var xmlhttp = new XMLHttpRequest();
+            xmlhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    console.timeEnd("dataReceived")
+
+                    var rawData = xmlhttp.responseText
+                    var jsonMeasurements = JSON.parse(rawData)
+
+                    var data = []
+                    for (var i = 0; i < jsonMeasurements.length; ++i) {
+                        var measurement = jsonMeasurements[i]
+                        data.push({x: new Date(measurement.timestamp), y: measurement.temp})
+                    }
+
+                    drawChart(data)
+                }
+            };
+            xmlhttp.open('GET', './data?range=' + range);
+            xmlhttp.send();
+            console.time("dataReceived")
+        }
     </script>
   </body>
 </html>

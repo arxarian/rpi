@@ -20,6 +20,15 @@ app.use('/scripts', express.static(__dirname + '/node_modules/moment/min/'))
 app.set('port', 80);
 
 app.get('/data', function (req, res) {
+    range = req.query.range
+
+    if (range !== "week" && range !== "day") {
+        console.log("undefined range: ", range,", set default")
+        range = "day"
+    }
+
+    console.log("request", range)
+
     console.time("request")
     var pool = new pg.Pool(config);
 
@@ -30,7 +39,7 @@ app.get('/data', function (req, res) {
         console.time("connect")
 
         client.query("SELECT timestamp,temp FROM basecamp " +
-                     "WHERE timestamp > now() - interval '1 day'" +
+                     "WHERE timestamp > now() - interval '1 " + range + "'" +
                      "ORDER BY timestamp", function (err, result) {
             done()
             console.time("end")
